@@ -1,8 +1,13 @@
 let isScientific = false; // Initial mode is basic calculator
 let history = [];
 
+// Ensure the basic calculator loads when the webpage opens
 window.onload = function () {
     loadBasicCalculator(); // Load the basic calculator by default
+    const storedHistory = localStorage.getItem('calcHistory');
+    if (storedHistory) {
+        history = JSON.parse(storedHistory);
+    }
     updateHistory(); // Load saved history from localStorage
 
     // Add event listener for keyboard input
@@ -25,18 +30,15 @@ function handleKeyboardInput(event) {
 
     // Handle numbers, operators, and special keys
     if (/\d/.test(key)) {
-        appendToExpression(key); // Append number
+        appendToExpression(key);
     } else if (['+', '-', '*', '/'].includes(key)) {
-        appendToExpression(key); // Append operator
-    } else if (key === 'Enter' || key === '=') {
-        event.preventDefault(); // Prevent form submission on 'Enter'
-        calculateResult(); // Perform calculation
+        appendToExpression(` ${key} `);
+    } else if (key === 'Enter') {
+        calculateResult();
     } else if (key === 'Backspace') {
-        DeleteExpression(); // Delete the last character
+        DeleteExpression();
     } else if (key === 'Escape') {
-        clearExpression(); // Clear input on 'Escape'
-    } else if (key === '.') {
-        appendToExpression('.'); // Append decimal point
+        clearExpression();
     }
 }
 
@@ -92,44 +94,88 @@ function loadScientificCalculator() {
     `;
 }
 
-function appendToExpression(value) {
-    const result = document.getElementById('result');
-    result.value += value;
-}
-
-function clearExpression() {
-    const result = document.getElementById('result');
-    result.value = '';
-}
-
-function DeleteExpression() {
-    const result = document.getElementById('result');
-    result.value = result.value.slice(0, -1);
-}
-
-function calculateResult() {
-    const result = document.getElementById('result');
-    try {
-        const calculation = eval(result.value);
-        if (!isNaN(calculation)) {
-            history.push(`${result.value} = ${calculation}`);
-            localStorage.setItem('calcHistory', JSON.stringify(history));
-            result.value = calculation;
-            updateHistory();
-        }
-    } catch {
-        result.value = 'Error';
-    }
-}
-
 function appendToScientificExpression(value) {
     const result = document.getElementById('result');
     result.value += value;
 }
 
-function clearScientificExpression() {
+function calculateResult() {
     const result = document.getElementById('result');
-    result.value = '';
+    let expression = result.value;
+
+    // Fix input for scientific functions by replacing function names with Math functions
+    expression = expression
+        .replace(/sin\(/g, 'Math.sin(')
+        .replace(/cos\(/g, 'Math.cos(')
+        .replace(/tan\(/g, 'Math.tan(')
+        .replace(/log\(/g, 'Math.log(')
+        .replace(/√/g, 'Math.sqrt('); // For square root
+
+    try {
+        // Safely evaluate the expression
+        const calculation = eval(expression);
+
+        // Check if calculation is a valid number
+        if (!isNaN(calculation)) {
+            // Store the valid calculation in history
+            history.push(`${result.value} = ${calculation}`);
+            localStorage.setItem('calcHistory', JSON.stringify(history));
+
+            // Update result display
+            result.value = calculation;
+            updateHistory();
+        } else {
+            // Handle NaN or undefined outputs
+            result.value = 'Error';
+        }
+    } catch (e) {
+        // Handle any errors in expression evaluation
+        result.value = 'Error';
+    }
 }
 
-// History management functions remain the same...
+function appendToExpression(value) {
+    const result = document.getElementById('result');
+    result.value += value; // Concatenate the input value to the existing expression
+}
+
+function clearExpression() {
+    const result = document.getElementById('result');
+    result.value = ''; // Clear the input
+}
+
+function DeleteExpression() {
+    const result = document.getElementById('result');
+    result.value = result.value.slice(0, -1); // Remove the last character
+}
+
+function toggleHistory() {
+    const historySection = document.getElementById('history-section');
+    historySection.style.display = historySection.style.display === 'none' ? 'block' : 'none';
+}
+
+function closeHistory() {
+    document.getElementById('history-section').style.display = 'none';
+}
+
+function updateHistory() {
+    const historyList = document.getElementById('history');
+    historyList.innerHTML = ''; // Clear current history
+
+    if (history.length === 0) {
+        document.getElementById('no-history-message').style.display = 'block';
+    } else {
+        document.getElementById('no-history-message').style.display = 'none';
+        history.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = item;
+            historyList.appendChild(li);
+        });
+    }
+}
+
+function clearHistory() {
+    history = []; // Clear history array
+    localStorage.removeItem('calcHistory'); // Clear from localStorage
+    updateHistory(); // Update the UI
+}

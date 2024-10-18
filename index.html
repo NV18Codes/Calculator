@@ -16,12 +16,12 @@
     </h1>
     <div class="app-container">
         <div class="calculator-container container">
-            <input type="text" id="result" readonly class="result-input">
+            <input type="text" id="result" readonly>
             <div id="buttons" class="buttons">
                 <!-- Buttons will be injected dynamically -->
             </div>
-            <button id="swap-calculator" class="action-btn" onclick="toggleCalculator()">Switch to Scientific</button>
-            <button id="history-toggle" class="action-btn" onclick="toggleHistory()">History</button>
+            <button id="swap-calculator" onclick="toggleCalculator()">Switch to Scientific</button>
+            <button id="history-toggle" onclick="toggleHistory()">History</button>
         </div>
 
         <!-- History Section with Transparent White Background -->

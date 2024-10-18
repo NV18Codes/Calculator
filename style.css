@@ -68,11 +68,11 @@ body {
 }
 
   
-.buttons {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr); /* Four buttons per row */
-  gap: 10px; /* Space between buttons */
-  margin-bottom: 20px;
+ .buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Four buttons per row */
+    gap: 10px; /* Space between buttons */
+    margin-bottom: 20px;
 }
 
   
