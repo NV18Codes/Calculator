@@ -1,181 +1,119 @@
-let isScientific = false; // Initial mode is basic calculator
+// Initialize variables
 let history = [];
+const resultDisplay = document.getElementById('result');
+const historyToggle = document.getElementById('history-toggle');
+const historySection = document.getElementById('history-section');
+const closeHistoryButton = document.getElementById('close-history');
+const noHistoryMessage = document.getElementById('no-history-message');
+const historyList = document.getElementById('history');
+const swapButton = document.getElementById('swap-calculator');
 
-// Ensure the basic calculator loads when the webpage opens
-window.onload = function () {
-    loadBasicCalculator(); // Load the basic calculator by default
-    const storedHistory = localStorage.getItem('calcHistory');
-    if (storedHistory) {
-        history = JSON.parse(storedHistory);
-    }
-    updateHistory(); // Load saved history from localStorage
+// Event listener for DOMContentLoaded to initialize the calculator
+document.addEventListener('DOMContentLoaded', () => {
+    createBasicCalculator();
+    updateHistory(); // Ensure history is updated on load
 
-    // Add event listener for keyboard input
-    window.addEventListener('keydown', handleKeyboardInput);
-};
+    // Toggle between basic and scientific calculators
+    swapButton.addEventListener('click', () => {
+        isScientific = !isScientific;
+        swapButton.textContent = isScientific ? 'Switch to Basic' : 'Switch to Scientific';
+        isScientific ? createScientificCalculator() : createBasicCalculator();
+    });
 
-function toggleCalculator() {
-    isScientific = !isScientific; // Toggle the mode
-    if (isScientific) {
-        loadScientificCalculator(); // Load scientific calculator
-        document.getElementById('swap-calculator').textContent = 'Switch to Basic'; // Update button text
-    } else {
-        loadBasicCalculator(); // Load basic calculator
-        document.getElementById('swap-calculator').textContent = 'Switch to Scientific'; // Update button text
-    }
+    // Show history section
+    historyToggle.addEventListener('click', () => {
+        historySection.classList.remove('hidden');
+    });
+
+    // Close history section
+    closeHistoryButton.addEventListener('click', () => {
+        historySection.classList.add('hidden');
+    });
+
+    // Clear history functionality
+    document.getElementById('clear-history').addEventListener('click', () => {
+        history = []; // Clear the history array
+        updateHistory(); // Update the displayed history
+    });
+});
+
+// Function to create and display the basic calculator buttons
+function createBasicCalculator() {
+    const buttonsContainer = document.getElementById('buttons');
+    buttonsContainer.innerHTML = '';
+
+    const basicButtons = [
+        '7', '8', '9', '/',
+        '4', '5', '6', '*',
+        '1', '2', '3', '-',
+        '0', '.', '=', '+',
+        'C'
+    ];
+
+    basicButtons.forEach(button => {
+        const buttonElement = document.createElement('button');
+        buttonElement.innerText = button;
+        buttonElement.classList.add('bg-white', 'bg-opacity-80', 'text-black', 'px-5', 'py-3', 'rounded-lg', 'cursor-pointer');
+        buttonElement.addEventListener('click', () => handleButtonClick(button));
+        buttonsContainer.appendChild(buttonElement);
+    });
 }
 
-function handleKeyboardInput(event) {
-    const key = event.key;
+// Function to create and display the scientific calculator buttons
+function createScientificCalculator() {
+    const buttonsContainer = document.getElementById('buttons');
+    buttonsContainer.innerHTML = '';
 
-    // Handle numbers, operators, and special keys
-    if (/\d/.test(key)) {
-        appendToExpression(key);
-    } else if (['+', '-', '*', '/'].includes(key)) {
-        appendToExpression(` ${key} `);
-    } else if (key === 'Enter') {
-        calculateResult();
-    } else if (key === 'Backspace') {
-        DeleteExpression();
-    } else if (key === 'Escape') {
-        clearExpression();
-    }
+    const scientificButtons = [
+        'sin', 'cos', 'tan', 'log',
+        '7', '8', '9', '/',
+        '4', '5', '6', '*',
+        '1', '2', '3', '-',
+        '0', '.', '=', '+',
+        'C'
+    ];
+
+    scientificButtons.forEach(button => {
+        const buttonElement = document.createElement('button');
+        buttonElement.innerText = button;
+        buttonElement.classList.add('bg-white', 'bg-opacity-80', 'text-black', 'px-5', 'py-3', 'rounded-lg', 'cursor-pointer');
+        buttonElement.addEventListener('click', () => handleButtonClick(button));
+        buttonsContainer.appendChild(buttonElement);
+    });
 }
 
-function loadBasicCalculator() {
-    const buttonContainer = document.getElementById('buttons');
-    buttonContainer.innerHTML = `
-        <button onclick="appendToExpression('7')">7</button>
-        <button onclick="appendToExpression('8')">8</button>
-        <button onclick="appendToExpression('9')">9</button>
-        <button onclick="appendToExpression('/')">÷</button>
-        <button onclick="appendToExpression('4')">4</button>
-        <button onclick="appendToExpression('5')">5</button>
-        <button onclick="appendToExpression('6')">6</button>
-        <button onclick="appendToExpression('*')">×</button>
-        <button onclick="appendToExpression('1')">1</button>
-        <button onclick="appendToExpression('2')">2</button>
-        <button onclick="appendToExpression('3')">3</button>
-        <button onclick="appendToExpression('-')">−</button>
-        <button onclick="appendToExpression('0')">0</button>
-        <button onclick="appendToExpression('.')">.</button>
-        <button onclick="calculateResult()">=</button>
-        <button onclick="appendToExpression('+')">+</button>
-        <button onclick="clearExpression()">C</button>
-        <button onclick="DeleteExpression()">Del</button>
-    `;
-}
+// Handle button click events
+function handleButtonClick(buttonValue) {
+    if (buttonValue === 'C') {
+        resultDisplay.value = ''; // Clear the result display
+    } else if (buttonValue === '=') {
+        try {
+            const equation = resultDisplay.value;
+            const result = eval(equation);
+            resultDisplay.value = result;
 
-function loadScientificCalculator() {
-    const buttonContainer = document.getElementById('buttons');
-    buttonContainer.innerHTML = `
-        <button onclick="appendToScientificExpression('sin(')">sin</button>
-        <button onclick="appendToScientificExpression('cos(')">cos</button>
-        <button onclick="appendToScientificExpression('tan(')">tan</button>
-        <button onclick="appendToScientificExpression('log(')">log</button>
-        <button onclick="appendToExpression('7')">7</button>
-        <button onclick="appendToExpression('8')">8</button>
-        <button onclick="appendToExpression('9')">9</button>
-        <button onclick="appendToExpression('/')">÷</button>
-        <button onclick="appendToExpression('4')">4</button>
-        <button onclick="appendToExpression('5')">5</button>
-        <button onclick="appendToExpression('6')">6</button>
-        <button onclick="appendToExpression('*')">×</button>
-        <button onclick="appendToExpression('1')">1</button>
-        <button onclick="appendToExpression('2')">2</button>
-        <button onclick="appendToExpression('3')">3</button>
-        <button onclick="appendToExpression('-')">−</button>
-        <button onclick="appendToExpression('0')">0</button>
-        <button onclick="appendToExpression('.')">.</button>
-        <button onclick="calculateResult()">=</button>
-        <button onclick="appendToExpression('+')">+</button>
-        <button onclick="clearExpression()">C</button>
-        <button onclick="DeleteExpression()">Del</button>
-    `;
-}
-
-function appendToScientificExpression(value) {
-    const result = document.getElementById('result');
-    result.value += value;
-}
-
-function calculateResult() {
-    const result = document.getElementById('result');
-    let expression = result.value;
-
-    // Fix input for scientific functions by replacing function names with Math functions
-    expression = expression
-        .replace(/sin\(/g, 'Math.sin(')
-        .replace(/cos\(/g, 'Math.cos(')
-        .replace(/tan\(/g, 'Math.tan(')
-        .replace(/log\(/g, 'Math.log(')
-        .replace(/√/g, 'Math.sqrt('); // For square root
-
-    try {
-        // Safely evaluate the expression
-        const calculation = eval(expression);
-
-        // Check if calculation is a valid number
-        if (!isNaN(calculation)) {
-            // Store the valid calculation in history
-            history.push(`${result.value} = ${calculation}`);
-            localStorage.setItem('calcHistory', JSON.stringify(history));
-
-            // Update result display
-            result.value = calculation;
+            // Save the full equation along with the result to history
+            history.push(`${equation} = ${result}`);
             updateHistory();
-        } else {
-            // Handle NaN or undefined outputs
-            result.value = 'Error';
+        } catch (error) {
+            resultDisplay.value = 'Error';
         }
-    } catch (e) {
-        // Handle any errors in expression evaluation
-        result.value = 'Error';
+    } else {
+        resultDisplay.value += buttonValue; // Append button value to result display
     }
 }
 
-function appendToExpression(value) {
-    const result = document.getElementById('result');
-    result.value += value; // Concatenate the input value to the existing expression
-}
-
-function clearExpression() {
-    const result = document.getElementById('result');
-    result.value = ''; // Clear the input
-}
-
-function DeleteExpression() {
-    const result = document.getElementById('result');
-    result.value = result.value.slice(0, -1); // Remove the last character
-}
-
-function toggleHistory() {
-    const historySection = document.getElementById('history-section');
-    historySection.style.display = historySection.style.display === 'none' ? 'block' : 'none';
-}
-
-function closeHistory() {
-    document.getElementById('history-section').style.display = 'none';
-}
-
+// Update history display
 function updateHistory() {
-    const historyList = document.getElementById('history');
     historyList.innerHTML = ''; // Clear current history
-
     if (history.length === 0) {
-        document.getElementById('no-history-message').style.display = 'block';
+        noHistoryMessage.classList.remove('hidden');
     } else {
-        document.getElementById('no-history-message').style.display = 'none';
-        history.forEach(item => {
-            const li = document.createElement('li');
-            li.textContent = item;
-            historyList.appendChild(li);
+        noHistoryMessage.classList.add('hidden');
+        history.forEach(entry => {
+            const historyItem = document.createElement('li');
+            historyItem.textContent = entry;
+            historyList.appendChild(historyItem);
         });
     }
-}
-
-function clearHistory() {
-    history = []; // Clear history array
-    localStorage.removeItem('calcHistory'); // Clear from localStorage
-    updateHistory(); // Update the UI
 }

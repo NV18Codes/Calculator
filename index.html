@@ -4,35 +4,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <script defer src="script.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>Calculator App</title>
 </head>
 
-<body>
-    <h1 class="main-title">
-        <img src="https://cdn-icons-png.flaticon.com/128/891/891175.png" alt="Calculator Icon" class="calculator-icon">
+<body class="relative h-screen m-0 p-0 font-sans overflow-hidden">
+    <h1 class="text-left text-darkblue my-5 mx-5">
+        <img src="https://cdn-icons-png.flaticon.com/128/891/891175.png" alt="Calculator Icon" class="w-8 inline mr-2 align-middle">
         Calculator
     </h1>
-    <div class="app-container">
-        <div class="calculator-container container">
-            <input type="text" id="result" readonly>
-            <div id="buttons" class="buttons">
+    <div class="flex items-start mx-5">
+        <div class="calculator-container w-full max-w-xs bg-blue-400 bg-opacity-70 p-5 rounded-lg shadow-lg">
+            <input type="text" id="result" readonly class="block w-full mb-5 mx-auto text-justify">
+            <div id="buttons" class="grid grid-cols-4 gap-2 mb-5">
                 <!-- Buttons will be injected dynamically -->
             </div>
-            <button id="swap-calculator" onclick="toggleCalculator()">Switch to Scientific</button>
-            <button id="history-toggle" onclick="toggleHistory()">History</button>
+            <button id="swap-calculator" class="relative px-5 py-3 bg-white bg-opacity-70 text-black rounded-lg mt-5 cursor-pointer">
+                Switch to Scientific
+            </button>
+            <button id="history-toggle" class="relative px-5 py-3 bg-white bg-opacity-70 text-black rounded-lg mt-5 cursor-pointer">
+                History
+            </button>
         </div>
 
-        <!-- History Section with Transparent White Background -->
-        <div id="history-section" class="history-container" style="display: none;">
-            <button id="close-history" class="close-btn" onclick="closeHistory()">X</button>
-            <h2 class="history-title">History</h2>
-            <p id="no-history-message" class="no-history">No calculations performed yet!</p>
-            <ul id="history" class="history-list"></ul>
-            <button class="clear-history-btn" onclick="clearHistory()">Clear History</button>
+        <div id="history-section" class="history-container bg-white bg-opacity-80 text-black p-5 rounded-lg shadow-lg absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-lg z-50 hidden">
+            <button id="close-history" class="text-xl font-bold float-right cursor-pointer">X</button>
+            <h2 class="text-2xl font-bold text-center mb-5">History</h2>
+            <p id="no-history-message" class="text-center italic mb-5">No calculations performed yet!</p>
+            <ul id="history" class="list-none p-0 m-0"></ul>
+            <button id="clear-history" class="block w-full px-5 py-3 mt-5 bg-red-600 text-white rounded-lg cursor-pointer">
+                Clear History
+            </button>
+            
         </div>
     </div>
+
+    <!-- Link your script.js file here -->
+    <script src="script.js"></script>
+
+    <style>
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://media.istockphoto.com/id/1079636098/photo/random-numbers-pattern-abstract-blue-background.jpg?s=612x612&w=0&k=20&c=Cvzxe8RGMx-qNfFk0jP9JaBFR6mjuL0rmz45NyPF0Jc=');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.5;
+            z-index: -1;
+        }
+    </style>
+    
 </body>
 
 </html>
