@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script defer src="script.js"></script>
+    <title>Calculator App</title>
+</head>
+
+<body>
+    <h1 class="main-title">
+        <img src="https://cdn-icons-png.flaticon.com/128/891/891175.png" alt="Calculator Icon" class="calculator-icon">
+        Calculator
+    </h1>
+    <div class="app-container">
+        <div class="calculator-container container">
+            <input type="text" id="result" readonly class="result-input">
+            <div id="buttons" class="buttons">
+                <!-- Buttons will be injected dynamically -->
+            </div>
+            <button id="swap-calculator" class="action-btn" onclick="toggleCalculator()">Switch to Scientific</button>
+            <button id="history-toggle" class="action-btn" onclick="toggleHistory()">History</button>
+        </div>
+
+        <!-- History Section with Transparent White Background -->
+        <div id="history-section" class="history-container" style="display: none;">
+            <button id="close-history" class="close-btn" onclick="closeHistory()">X</button>
+            <h2 class="history-title">History</h2>
+            <p id="no-history-message" class="no-history">No calculations performed yet!</p>
+            <ul id="history" class="history-list"></ul>
+            <button class="clear-history-btn" onclick="clearHistory()">Clear History</button>
+        </div>
+    </div>
+</body>
+
+</html>
